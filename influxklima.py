@@ -1,11 +1,17 @@
+from influxdb import InfluxDBClient
 import serial
 import json
 import os
-
-ser = serial.Serial('/dev/ttyACM2',115200)
-ser.flushInput()
+import datetime
 
 location = os.getenv('LOCATION', "Sluppen")
+devicepath = os.getenv('DEVICE_PATH', '/dev/ttyACM2')
+influxhost=os.getenv('INFLUXDB_HOST', "influxdb")
+influxport=os.getenv('INFLUXDB_PORT', 8086)
+influxuser=os.getenv('INFLUXDB_USER', 'root')
+influxpw=os.getenv('INFLUXDB_PW', 'root')
+influxdb=os.getenv('INFLUXDB_DATABASE', 'inoklima')
+debug=os.getenv('DEBUG', 'False')
 
 def is_json(myjson):
   try:
@@ -13,6 +19,18 @@ def is_json(myjson):
   except ValueError as e:
     return False
   return True
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
+if str2bool(debug):
+    print("Influxdb Host: " + influxuser + "@" + influxhost + ":" + str(influxport))
+    print("Influxdb Password: " + '*'*len(influxpw))
+    print("Influxdb DB: " + influxdb)
+
+ser = serial.Serial(devicepath, 115200)
+ser.flushInput()
+client = InfluxDBClient(influxhost, influxport, influxuser, influxpw, influxdb)
 
 while True:
     try:
@@ -29,9 +47,9 @@ while True:
             rawEthanol = data['RawEthanol']
             TVOC = data['TVOC']
             eCO2 = data['eCO2']
-            light = data['eCO2']
+            light = data['lux']
 
-            output = [
+            data = [
             {
                 "measurement": "klima",
                 "tags": {
@@ -51,8 +69,11 @@ while True:
                 }
             }
             ]
-
-            print(output)
+            
+            if str2bool(debug):
+              print(data)
+            
+            client.write_points(data)
     except:
-        print("Keyboard Interrupt")
+        print("Interrupt")
         break
