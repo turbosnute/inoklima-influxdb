@@ -11,7 +11,7 @@ sudo docker exec -it influxdb influx
 
 Then start the inoklima-influxdb container:
 ```
-sudo docker run -t -i --device=/dev/ttyACM2 \
+sudo docker run -d --device=/dev/ttyACM2 \
  -e LOCATION='Lilby' \
  -e DEVICE_PATH='/dev/ttyACM2' \
  -e INFLUXDB_HOST='nerd' \
