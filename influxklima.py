@@ -20,6 +20,13 @@ def is_json(myjson):
     return False
   return True
 
+def is_HexDecNumeric(ser):
+  try:
+    int(ser,16)
+  except ValueError as e:
+    return False
+  return True
+
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
@@ -97,6 +104,10 @@ while True:
               # Query InfluxDB.
               # Send reply.
               influxdata = [{"nuthin": "null"}}]
+              query = "SELECT * FROM sgp30_base WHERE serial='" + serial + "' ORDER BY DESC LIMIT 1;"
+              res = client.query(query)
+              if len(res) > 0:   
+                print("got baseline from influxdb")
               print("request received.")
             if str2bool(debug):
               print(influxdata)
