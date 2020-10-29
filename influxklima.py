@@ -71,7 +71,7 @@ while True:
                     }
                 }
                 ]
-                client.write_points(data)
+
             elif "ECO2BASE" in data:
                 #{ "ECO2BASE": "8F2B", "TVOCBASE": "91BB" }
                 # BASELINE CALIBRATION
@@ -91,15 +91,15 @@ while True:
                     }
                 }
                 ]
+                client.write_points(influxdata)
             elif "Request" in data:
               # Request for previous baseline.
               # Query InfluxDB.
               # Send reply.
+              influxdata = [{"nuthin": "null"}}]
               print("request received.")
             if str2bool(debug):
               print(influxdata)
-            
-            client.write_points(influxdata)
     except:
         print("Interrupt")
         break
