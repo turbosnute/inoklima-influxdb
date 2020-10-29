@@ -51,7 +51,7 @@ while True:
                 eCO2 = data['eCO2']
                 light = data['lux']
                 
-                data = [
+                influxdata = [
                 {
                     "measurement": "klima",
                     "tags": {
@@ -91,16 +91,15 @@ while True:
                     }
                 }
                 ]
-                client.write_points(data)
             elif "Request" in data:
               # Request for previous baseline.
               # Query InfluxDB.
               # Send reply.
               print("request received.")
             if str2bool(debug):
-              print(data)
+              print(influxdata)
             
-            #client.write_points(data)
+            client.write_points(influxdata)
     except:
         print("Interrupt")
         break
