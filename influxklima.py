@@ -38,37 +38,62 @@ while True:
         decoded_bytes = ser_bytes[0:len(ser_bytes)-2].decode("utf-8")
         if is_json(decoded_bytes) is True:
             data = json.loads(decoded_bytes)
-            temp = data['Temp']
-            humidity = data['Humidity']
-            pressure = data['Pressure']
-            dewPoint = data['DewPoint']
-            equivSeaLvlPressure = data['EquivSeaLvlPressure']
-            rawH2 = data['RawH2']
-            rawEthanol = data['RawEthanol']
-            TVOC = data['TVOC']
-            eCO2 = data['eCO2']
-            light = data['lux']
-
-            data = [
-            {
-                "measurement": "klima",
-                "tags": {
-                    "location": location
-                },
-                "fields": {
-                     "Temperature": temp,
-                     "Humidity": humidity,
-                     "Pressure": pressure,
-                     "dewPoint": dewPoint,
-                     "SeaLevelPressure": equivSeaLvlPressure,
-                     "H2": rawH2,
-                     "Ethanol": rawEthanol,
-                     "TVOC": TVOC,
-                     "eCO2": eCO2,
-                     "Light": light
+            if "Temp" in data:
+                # MEASUREMENT
+                temp = data['Temp']
+                humidity = data['Humidity']
+                pressure = data['Pressure']
+                dewPoint = data['DewPoint']
+                equivSeaLvlPressure = data['EquivSeaLvlPressure']
+                rawH2 = data['RawH2']
+                rawEthanol = data['RawEthanol']
+                TVOC = data['TVOC']
+                eCO2 = data['eCO2']
+                light = data['lux']
+                
+                data = [
+                {
+                    "measurement": "klima",
+                    "tags": {
+                        "location": location
+                    },
+                    "fields": {
+                        "Temperature": temp,
+                        "Humidity": humidity,
+                        "Pressure": pressure,
+                        "dewPoint": dewPoint,
+                        "SeaLevelPressure": equivSeaLvlPressure,
+                        "H2": rawH2,
+                        "Ethanol": rawEthanol,
+                        "TVOC": TVOC,
+                        "eCO2": eCO2,
+                        "Light": light
+                    }
                 }
-            }
-            ]
+                ]
+            elif "ECO2BASE" in data:
+                #{ "ECO2BASE": "8F2B", "TVOCBASE": "91BB" }
+                # BASELINE CALIBRATION
+                serial = data['Serial']
+                eCO2_base = data['ECO2BASE']
+                TVOC_base = data['TVOCBASE']
+
+                influxdata = [
+                {
+                    "measurement": "sgp30_base",
+                    "tags": {
+                        "serial": serial
+                    },
+                    "fields": {
+                        "eCO2_base": eCO2_base,
+                        "TVOC_base": TVOC_base
+                    }
+                }
+                ]
+            elif "Request" in data:
+              # Request for previous baseline.
+              # Query InfluxDB.
+              # Send reply.
             
             if str2bool(debug):
               print(data)
