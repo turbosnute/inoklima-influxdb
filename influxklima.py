@@ -78,7 +78,6 @@ while True:
                     }
                 }
                 ]
-
             elif "ECO2BASE" in data:
                 #{ "ECO2BASE": "8F2B", "TVOCBASE": "91BB" }
                 # BASELINE CALIBRATION
@@ -98,17 +97,30 @@ while True:
                     }
                 }
                 ]
+                if str2bool(debug):
+                  print(influxdata)
                 client.write_points(influxdata)
             elif "Request" in data:
               # Request for previous baseline.
               # Query InfluxDB.
               # Send reply.
+              if str2bool(debug):
+                print("request received.")
               influxdata = [{"nuthin": "null"}}]
               query = "SELECT * FROM sgp30_base WHERE serial='" + serial + "' ORDER BY DESC LIMIT 1;"
               res = client.query(query)
-              if len(res) > 0:   
-                print("got baseline from influxdb")
-              print("request received.")
+              if len(res) > 0:
+                if str2bool(debug):
+                  print("got baseline from influxdb")
+                points = res.get_points()[0]
+                savedTvoc = points['TVOC_base']
+                savedEco2 = poitns['eCO2_base']
+                response = "<" + savedEco2 + '|' + savedTvoc+ ">"
+                serial.write(response)
+              else:
+                if str2bool(debug):
+                  print("no saved baselines")
+                serial.write('<Null>')
             if str2bool(debug):
               print(influxdata)
     except:
