@@ -81,7 +81,7 @@ while True:
             elif "ECO2BASE" in data:
                 #{ "ECO2BASE": "8F2B", "TVOCBASE": "91BB" }
                 # BASELINE CALIBRATION
-                serial = data['Serial']
+                serialnum = data['Serial']
                 eCO2_base = data['ECO2BASE']
                 TVOC_base = data['TVOCBASE']
 
@@ -89,7 +89,7 @@ while True:
                 {
                     "measurement": "sgp30_base",
                     "tags": {
-                        "serial": serial
+                        "serial": serialnum
                     },
                     "fields": {
                         "eCO2_base": eCO2_base,
@@ -107,21 +107,23 @@ while True:
               if str2bool(debug):
                 print("request received.")
               influxdata = [{"nuthin": "null"}]
-              serial = data['Serial']
-              query = "SELECT * FROM sgp30_base WHERE serial='" + serial + "' ORDER BY DESC LIMIT 1;"
+              serialnum = data['Serial']
+              query = "SELECT * FROM sgp30_base WHERE serial='" + serialnum + "' ORDER BY DESC LIMIT 1;"
               res = client.query(query)
               if len(res) > 0:
                 if str2bool(debug):
                   print("got baseline from influxdb")
-                points = res.get_points()[0]
+                points = list(res.get_points())[0]
                 savedTvoc = points['TVOC_base']
-                savedEco2 = poitns['eCO2_base']
+                savedEco2 = points['eCO2_base']
                 response = "<" + savedEco2 + '|' + savedTvoc+ ">"
-                serial.write(response)
+                if str2bool(debug):
+                  print(response)
+                ser.write(response)
               else:
                 if str2bool(debug):
                   print("no saved baselines")
-                serial.write('<Null>')
+                ser.write('<Null>')
             if str2bool(debug):
               print(influxdata)
     except:
