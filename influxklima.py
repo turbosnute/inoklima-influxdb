@@ -107,6 +107,7 @@ while True:
               if str2bool(debug):
                 print("request received.")
               influxdata = [{"nuthin": "null"}]
+              serial = data['Serial']
               query = "SELECT * FROM sgp30_base WHERE serial='" + serial + "' ORDER BY DESC LIMIT 1;"
               res = client.query(query)
               if len(res) > 0:
