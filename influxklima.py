@@ -78,6 +78,7 @@ while True:
                     }
                 }
                 ]
+                client.write_points(influxdata)
             elif "ECO2BASE" in data:
                 #{ "ECO2BASE": "8F2B", "TVOCBASE": "91BB" }
                 # BASELINE CALIBRATION
