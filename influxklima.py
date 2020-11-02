@@ -120,11 +120,12 @@ while True:
                 response = "<" + savedEco2 + '|' + savedTvoc+ ">"
                 if str2bool(debug):
                   print(response)
-                ser.write(response)
+                ser.write(response.encode())
               else:
                 if str2bool(debug):
                   print("no saved baselines")
-                ser.write('<Null>')
+                response = '<Null>'
+                ser.write(response.encode())
             if str2bool(debug):
               print(influxdata)
     except:
